@@ -2963,10 +2963,11 @@ function handleIntersectionResults(result: ParsePayload, left: ParsePayload, rig
   if (aggregated.length) result.issues.push({ ...unrecIssue!, keys: aggregated });
   for (const iss of rejected) result.issues.push(iss);
 
+  // a failed side's value is never used, and merging two cyclic outputs that aren't the same objects never ends
+  if (util.aborted(result)) return result;
   const merged = mergeValues(left.value, right.value);
 
   if (!merged.valid) {
-    if (util.aborted(result)) return result;
     throw new Error(`Unmergable intersection. Error path: ` + `${JSON.stringify(merged.mergeErrorPath)}`);
   }
 
